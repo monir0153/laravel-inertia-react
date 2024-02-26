@@ -1,8 +1,36 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import Table from '@/Components/Table';
 import React from 'react'
+import Modal from '@/Components/Modal';
 
-function Category_index({ auth }) {
+function Category_index({ auth, category }) {
+    const { data, setData, delete: destroy } = useForm();
+
+    const columns = [
+        { header: 'SL', key: 'id' },
+        { header: 'Category', key: 'name' },
+        { header: 'Description', key: 'description' },
+        {
+            header: 'Action', render: (row) =>
+                <div className='flex justify-between gap-3'>
+                    <button className='bg-gray-100 px-4 py-1 text-gray-800 rounded font-medium' onClick={() => handleEdit(row)}>Edit</button>
+                    <button className='bg-gray-100 px-4 py-1 text-gray-800 rounded font-medium' onClick={() => handleDelete(row)}>Delete</button>
+                </div>
+        },
+    ];
+
+    const handleEdit = (row) => {
+        console.log("category: ", row.category,);
+        // < Modal />
+    };
+
+    const handleDelete = (row) => {
+        const confirm = window.confirm('Are you sure you want to sure delete this category');
+        if (confirm) {
+            destroy(route('category.destroy', row.id));
+        }
+    };
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -21,35 +49,7 @@ function Category_index({ auth }) {
 
 
                         <div className="relative overflow-x-auto">
-                            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                    <tr>
-                                        <th scope="col" className="px-6 py-3">
-                                            SL
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Category
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            Apple MacBook Pro 17"
-                                        </th>
-                                        <td className="px-6 py-4">
-                                            Silver
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            Laptop
-                                        </td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
+                            <Table data={category} columns={columns} />
                         </div>
 
                     </div>
