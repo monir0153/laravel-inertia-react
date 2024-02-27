@@ -1,11 +1,59 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import Table from '@/Components/Table';
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Modal from '@/Components/Modal';
+import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
 
 function Category_index({ auth, category }) {
-    const { data, setData, delete: destroy } = useForm();
+    const { data, setData, delete: destroy, post, put, processing, errors, reset } = useForm();
+    const [showModal, setShowModal] = useState(false);
+    const [editCategory, setEditCategory] = useState(null); // State to hold category being edited
+
+    // Function to handle opening modal for editing a category
+    const handleEdit = (row) => {
+        setEditCategory(row); // Set the category data to edit
+        setShowModal(true); // Open the modal
+    };
+    const handleCloseModal = () => {
+        setShowModal(false);
+        reset();
+    };
+    const handleDelete = (row) => {
+        destroy(route('category.destroy', row.id));
+    };
+    // Function to handle submitting the form
+    const submit = (e) => {
+        e.preventDefault();
+        if (editCategory) {
+            // If editing, use PUT request with category ID
+            put(route('category.update', editCategory.id), {
+                onSuccess: () => {
+                    setShowModal(false); // Close the modal after successful update
+                    // setEditCategory(null); // Reset edit category data
+                },
+            });
+        } else {
+            // If not editing, use POST request
+            post(route('category.store'), {
+                onSuccess: () => {
+                    setShowModal(false); // Close the modal after successful creation
+                    reset(); // Reset form data
+                },
+            });
+        }
+    };
+
+    useEffect(() => {
+        if (editCategory) {
+            // If editing a category, set the initial data for the form
+            setData('name', editCategory.name);
+            setData('description', editCategory.description);
+        }
+    }, [editCategory]);
 
     const columns = [
         { header: 'SL', key: 'id' },
@@ -20,17 +68,6 @@ function Category_index({ auth, category }) {
         },
     ];
 
-    const handleEdit = (row) => {
-        console.log("category: ", row.category,);
-        // < Modal />
-    };
-
-    const handleDelete = (row) => {
-        const confirm = window.confirm('Are you sure you want to sure delete this category');
-        if (confirm) {
-            destroy(route('category.destroy', row.id));
-        }
-    };
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -53,8 +90,55 @@ function Category_index({ auth, category }) {
                         </div>
 
                     </div>
+                    {(
+                        <Modal show={showModal} setShowModal={setShowModal} onClose={handleCloseModal}>
+                            <form className="max-w-md mx-auto my-8" onSubmit={submit}>
+                                <div>
+                                    <div>
+                                        <InputLabel htmlFor="name" value="Category name" />
+
+                                        <TextInput
+                                            id="name"
+                                            type="text"
+                                            name="name"
+                                            value={data.name || (editCategory ? editCategory.name : '')} // Use editCategory if available
+                                            className="my-1 block w-full"
+                                            autoComplete="name"
+                                            isFocused={true}
+                                            onChange={(e) => setData('name', e.target.value)}
+                                        />
+
+                                        <InputError message={errors.name} className="mt-2" />
+                                    </div>
+
+                                    <div>
+                                        <InputLabel htmlFor="description" value="Category Description" />
+
+                                        <TextInput
+                                            id="description"
+                                            type="text"
+                                            name="description"
+                                            value={data.description || (editCategory ? editCategory.description : '')} // Use editCategory if available
+                                            className="my-1 block w-full"
+                                            autoComplete="description"
+                                            isFocused={false}
+                                            onChange={(e) => setData('description', e.target.value)}
+                                        />
+
+                                        <InputError message={errors.description} className="mt-2" />
+                                    </div>
+
+
+                                </div>
+                                <PrimaryButton className="my-4" disabled={processing}>
+                                    Submit
+                                </PrimaryButton>
+                            </form>
+                        </Modal>
+                    )}
                 </div>
             </div>
+
         </AuthenticatedLayout >
     )
 }
