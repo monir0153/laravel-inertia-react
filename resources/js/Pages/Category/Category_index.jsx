@@ -9,6 +9,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 
 function Category_index({ auth, category }) {
+
     const { data, setData, delete: destroy, post, put, processing, errors, reset } = useForm();
     const [showModal, setShowModal] = useState(false);
     const [editCategory, setEditCategory] = useState(null); // State to hold category being edited
@@ -28,20 +29,16 @@ function Category_index({ auth, category }) {
     // Function to handle submitting the form
     const submit = (e) => {
         e.preventDefault();
+        const form = e.target
+        const name = form.name.value;
+        const description = form.description.value;
+        // console.log(editCategory)
         if (editCategory) {
             // If editing, use PUT request with category ID
-            put(route('category.update', editCategory.id), {
+            put(route('category.update', editCategory?.id), {
                 onSuccess: () => {
                     setShowModal(false); // Close the modal after successful update
-                    // setEditCategory(null); // Reset edit category data
-                },
-            });
-        } else {
-            // If not editing, use POST request
-            post(route('category.store'), {
-                onSuccess: () => {
-                    setShowModal(false); // Close the modal after successful creation
-                    reset(); // Reset form data
+                    reset();
                 },
             });
         }
@@ -49,9 +46,7 @@ function Category_index({ auth, category }) {
 
     useEffect(() => {
         if (editCategory) {
-            // If editing a category, set the initial data for the form
-            setData('name', editCategory.name);
-            setData('description', editCategory.description);
+            setData({ description: editCategory?.description, name: editCategory?.name });
         }
     }, [editCategory]);
 
