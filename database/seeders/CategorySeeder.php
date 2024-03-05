@@ -13,8 +13,9 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
+        Category::query()->delete();
         $category = [];
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 1000; $i++) {
             $category[] = [
                 "name" => "Category" . $i,
                 "description" => fake()->paragraph(1),

@@ -5,19 +5,24 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
+use App\Repositories\Interfaces\CategoryInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CategoryController extends Controller
 {
+    private $category;
+    public function __construct(CategoryInterface $category)
+    {
+        $this->category = $category;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $category = Category::latest()->get();
-        // return $category;
+        $category = Category::latest()->paginate(5);
         return inertia::render('Category/Category_index', ['category' => $category]);
     }
 
@@ -34,8 +39,8 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        $category = Category::create($request->validated());
-        return inertia::render('Category/Category_index',);
+        $this->category->create($request->validated());
+        return inertia::render('Category/Category_index');
     }
 
     /**
@@ -43,7 +48,7 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $this->category->getById($id);
     }
 
     /**
@@ -51,15 +56,15 @@ class CategoryController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $this->category->getById($id);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCategoryRequest $request, Category $category)
+    public function update(UpdateCategoryRequest $request, $id)
     {
-        $category->update($request->validated());
+        $this->category->update($id, $request->validated());
     }
 
     /**

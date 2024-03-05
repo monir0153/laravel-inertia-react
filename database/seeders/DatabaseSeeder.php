@@ -17,11 +17,13 @@ class DatabaseSeeder extends Seeder
 
         \App\Models\User::factory()->create([
             'name' => 'Test User',
-            'email' => 'test@test.com',
-            'password' => Hash::make('123'),
+            'email' => 'superadmin@gmail.com',
+            'password' => Hash::make('password'),
         ]);
         $this->call([
             CategorySeeder::class,
+            BrandSeeder::class,
+            ProductSeeder::class,
         ]);
     }
 }

@@ -1,6 +1,9 @@
 import React from 'react';
 
 const Table = ({ data, columns }) => {
+    // Extract the data array from the pagination object
+    const dataArray = data.data;
+
     return (
         <div className="relative overflow-x-auto">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-200">
@@ -14,7 +17,7 @@ const Table = ({ data, columns }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {data?.map((row, rowIndex) => (
+                    {dataArray?.map((row, rowIndex) => (
                         <tr key={rowIndex} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                             {columns?.map((column, colIndex) => (
                                 <td key={colIndex} className="px-6 py-4">
